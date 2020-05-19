@@ -9,35 +9,38 @@
 import Foundation
 import CAnnoyWrapper
 
-public class AnnoyIndex<T: Numeric> {
+
+public class AnnoyIndex<T: AnnoyOperable> {
+    
     public enum DistanceMetric: String{
         case euclidean
         case manhattan
         case hamming
         case dotProduct
     }
+
     
     //MARK: - Properties
     private let indexPointer: UnsafeRawPointer
-    public private(set) var numFeatures: Int
+    public private(set) var itemLength: Int
     public private(set) var distanceMetric: [CChar]
     public private(set) var dataType: [CChar]
     
     /**
     The number of items in the index.
     */
-    public var numberOfItems: Int32 {
+    public var numberOfItems: Int {
         get {
-            return C_get_n_items(indexPointer)
+            return Int(C_get_n_items(indexPointer))
         }
     }
     
     /**
         The number of trees in the index. (if built)
      */
-    public var numberOfTrees: Int32 {
+    public var numberOfTrees: Int {
         get {
-            return C_get_n_trees(indexPointer)
+            return Int(C_get_n_trees(indexPointer))
         }
     }
     
@@ -47,11 +50,16 @@ public class AnnoyIndex<T: Numeric> {
             - metric: The metric to be used to measure the distance between items.  One of .euclidean, .manhattan, .hamming, or .dotProduct
      */
     
-    public init(numFeatures features: Int, metric: DistanceMetric = .euclidean) {
-        numFeatures = features
+    public init(itemLength: Int, metric: DistanceMetric = .euclidean) {
+        self.itemLength = itemLength
         distanceMetric = metric.rawValue.cString(using: .utf8)!
         dataType = String(describing: T.self).cString(using: .utf8)!
-        indexPointer = C_initializeAnnoyIndex(Int32(numFeatures), &distanceMetric, &dataType)!
+        indexPointer = C_initializeAnnoyIndex(Int32(itemLength), &distanceMetric, &dataType)!
+    }
+    
+    deinit {
+        C_unload(indexPointer)
+        C_deleteAnnoyIndex(indexPointer)
     }
     
     /**
@@ -63,42 +71,69 @@ public class AnnoyIndex<T: Numeric> {
      
      */
     
-    public func addItem(index: Int, vector: inout [T]) -> Bool {
+    public func addItem(index: Int, vector: inout [T]) throws {
+        guard self.itemLength == vector.count else {
+            throw AnnoyIndexError.invalidVectorLength(message: "Expected vector.count = \(self.itemLength), input vector.count was \(vector.count).")
+        }
         let i = Int32(index)
-        let result = vector.withUnsafeMutableBufferPointer { (buffer) -> Bool in
+        let success = vector.withUnsafeMutableBufferPointer { (buffer) -> Bool in
             let p = buffer.baseAddress
             return C_add_item(i, p, &distanceMetric, &dataType, indexPointer)
         }
-        return result
+        if !success {
+            throw AnnoyIndexError.addItemFailed
+        }
+    }
+    
+    public func addItems(indices: [Int]? = nil, items: inout [[T]]) throws {
+        if let indices = indices {
+            guard indices.count == items.count else {
+                let message = "indices.count (\(indices.count)) != items.count (\(items.count)) "
+                throw AnnoyIndexError.mismatchedArrayLength(message: message)
+            }
+            for (i, index) in indices.enumerated() {
+                try? self.addItem(index: index, vector: &items[i])
+            }
+        } else {
+            for (index, _ ) in items.enumerated() {
+                try? self.addItem(index: index, vector: &items[index])
+            }
+        }
     }
     
     public func build(numTrees: Int) -> Bool {
-        return C_build(Int32(numTrees), &distanceMetric, &dataType, indexPointer)
+        let success = C_build(Int32(numTrees), &distanceMetric, &dataType, indexPointer)
+        return success
     }
+    
     public func unbuild() -> Bool{
         return C_unbuild(indexPointer)
     }
-    public func save(url: URL) {
+    
+    public func save(url: URL) throws {
         guard var filenameCString = url.path.cString(using: .utf8) else {
             return
         }
         let success = C_save(&filenameCString, indexPointer)
+        if !success {
+            throw AnnoyIndexError.saveFailed
+        }
     }
     
     public func unload() {
         C_unload(indexPointer)
     }
         
-    public func getDistance(item1: Int, item2: Int) -> Any? {
+    public func getDistance(item1: Int, item2: Int) -> T? {
         if T.self is Float.Type {
             var result = Float(-1.0)
             C_get_distance(Int32(item1), Int32(item2),&result, &distanceMetric, &dataType, indexPointer)
-            return result
+            return result as? T
         }
         if T.self is Int32.Type {
             var result = Int32(1)
             C_get_distance(Int32(item1), Int32(item2),&result, &distanceMetric, &dataType, indexPointer)
-            return Float(result)
+            return result as? T
         }
         return nil
     }
@@ -142,16 +177,16 @@ public class AnnoyIndex<T: Numeric> {
         C_verbose(boolVal, indexPointer)
     }
     
-    public func getItem(index: Int) -> [Any]? {
+    public func getItem(index: Int) -> [T]? {
         if T.self is Float.Type {
-            var item: [Float32] = Array(repeating: -1.0, count: numFeatures)
+            var item: [Float] = Array(repeating: -1.0, count: itemLength)
             C_get_item(Int32(index), &item, &distanceMetric, &dataType, indexPointer)
-            return item
+            return item as? [T]
         }
         if T.self is Int32.Type {
-            var item: [Int32] = Array(repeating: -1, count: numFeatures)
+            var item: [Int32] = Array(repeating: -1, count: itemLength)
             C_get_item(Int32(index), &item, &distanceMetric, &dataType, indexPointer)
-            return item
+            return item as? [T]
         }
         return nil
     }
