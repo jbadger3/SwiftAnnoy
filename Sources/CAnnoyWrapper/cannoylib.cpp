@@ -395,6 +395,10 @@ bool C_on_disk_build(const char* filename, const void* indexPointer) {
     return index->on_disk_build(filename);
 }
 
-
+void C_deleteAnnoyIndex(const void* indexPointer) {
+    AnnoyIndex<int, float, Euclidean, Kiss32Random> *index = (AnnoyIndex<int, float, Euclidean, Kiss32Random> *)indexPointer;
+    index->unbuild();
+    delete index;
+}
 
 
