@@ -33,6 +33,7 @@ void C_verbose(bool v, const void* indexPointer);
 void C_get_item(int item, void* vector, char* dist_metric, char* dtype, const void* indexPointer);
 void C_set_seed(int q, const void* indexPointer);
 bool C_on_disk_build(const char* filename, const void* indexPointer);
+void C_deleteAnnoyIndex(const void* indexPointer);
 
 #ifdef __cplusplus
 }
