@@ -10,8 +10,9 @@ import Foundation
 public enum AnnoyIndexError: Error, LocalizedError {
     case invalidVectorLength(message: String)
     case addItemFailed
+    case buildFailed
+    case unbuildFailed
     case saveFailed
-    case mismatchedArrayLength(message: String)
     
     public var errorDescription: String? {
         switch self {
@@ -19,10 +20,12 @@ public enum AnnoyIndexError: Error, LocalizedError {
             return message
         case .addItemFailed:
             return "Adding item to index failed."
+        case .buildFailed:
+            return nil
+        case .unbuildFailed:
+            return nil
         case .saveFailed:
             return nil //Errors should be printed to stdout by Annoy C++ lib
-        case .mismatchedArrayLength(let message):
-            return message
         }
     }
 }

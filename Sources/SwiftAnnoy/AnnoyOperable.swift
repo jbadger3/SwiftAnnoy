@@ -11,15 +11,16 @@ import Foundation
     Datatypes currently supported by SwiftAnnoy.
  
         1. Float
-        2. Int32
+        2. Double
  */
 public protocol AnnoyOperable {
     
 }
 
-extension Int32: AnnoyOperable {
+extension Float: AnnoyOperable {
     
 }
-extension Float: AnnoyOperable {
+
+extension Double: AnnoyOperable {
     
 }

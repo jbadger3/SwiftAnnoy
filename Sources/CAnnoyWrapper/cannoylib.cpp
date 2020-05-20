@@ -25,26 +25,23 @@ const void * C_initializeAnnoyIndex(int f, char* dist_metric, char* dtype) {
             AnnoyIndex<int, float, DotProduct, Kiss32Random> *index = new AnnoyIndex<int, float, DotProduct, Kiss32Random>(f);
             return (void *)index;
         }
-    } else if (strcmp(dtype, "int") == 0) {
+    } else if (strcmp(dtype, "Double") == 0) {
         if (strcmp(dist_metric, "euclidean") == 0) {
-            AnnoyIndex<int, int, Euclidean, Kiss32Random> *index = new AnnoyIndex<int, int, Euclidean, Kiss32Random>(f);
+            AnnoyIndex<int, double, Euclidean, Kiss32Random> *index = new AnnoyIndex<int, double, Euclidean, Kiss32Random>(f);
             return (void *)index;
         }
         else if (strcmp(dist_metric, "manhattan") == 0) {
-            AnnoyIndex<int, int, Manhattan, Kiss32Random> *index = new AnnoyIndex<int, int, Manhattan, Kiss32Random>(f);
-            return (void *)index;
-        }
-        else if (strcmp(dist_metric, "hamming") == 0) {
-            AnnoyIndex<int, int, Hamming, Kiss32Random> *index = new AnnoyIndex<int, int, Hamming, Kiss32Random>(f);
+            AnnoyIndex<int, double, Manhattan, Kiss32Random> *index = new AnnoyIndex<int, double, Manhattan, Kiss32Random>(f);
             return (void *)index;
         }
         else if (strcmp(dist_metric, "dotProduct") == 0) {
-            AnnoyIndex<int, int, DotProduct, Kiss32Random> *index = new AnnoyIndex<int, int, DotProduct, Kiss32Random>(f);
+            AnnoyIndex<int, double, DotProduct, Kiss32Random> *index = new AnnoyIndex<int, double, DotProduct, Kiss32Random>(f);
             return (void *)index;
         }
     }
-
-    return (void *)-1;
+    int fail = -1;
+    int* failPtr = &fail;
+    return (void *)failPtr;
 }
 
 
@@ -66,25 +63,20 @@ bool C_add_item(int i, void* vector, char* dist_metric, char* dtype, const void*
             const float *vec = (const float *)vector;
             return index->add_item(i, vec);
         }
-    } else if (strcmp(dtype, "int") == 0) {
+    } else if (strcmp(dtype, "Double") == 0) {
         if (strcmp(dist_metric, "euclidean") == 0) {
-            AnnoyIndex<int, int, Euclidean, Kiss32Random> *index = (AnnoyIndex<int, int, Euclidean, Kiss32Random> *)indexPointer;
-            const int *vec = (const int *)vector;
+            AnnoyIndex<int, double, Euclidean, Kiss32Random> *index = (AnnoyIndex<int, double, Euclidean, Kiss32Random> *)indexPointer;
+            const double *vec = (const double *)vector;
             return index->add_item(i, vec);
         }
         else if (strcmp(dist_metric, "manhattan") == 0) {
-            AnnoyIndex<int, int, Manhattan, Kiss32Random> *index = (AnnoyIndex<int, int, Manhattan, Kiss32Random> *)indexPointer;
-            const int *vec = (const int *)vector;
-            return index->add_item(i, vec);
-        }
-        else if (strcmp(dist_metric, "hamming") == 0) {
-            AnnoyIndex<int, int, Hamming, Kiss32Random> *index = (AnnoyIndex<int, int, Hamming, Kiss32Random> *)indexPointer;
-            const int *vec = (const int *)vector;
+            AnnoyIndex<int, double, Manhattan, Kiss32Random> *index = (AnnoyIndex<int, double, Manhattan, Kiss32Random> *)indexPointer;
+            const double *vec = (const double *)vector;
             return index->add_item(i, vec);
         }
         else if (strcmp(dist_metric, "dotProduct") == 0) {
-            AnnoyIndex<int, int, DotProduct, Kiss32Random> *index = (AnnoyIndex<int, int, DotProduct, Kiss32Random> *)indexPointer;
-            const int *vec = (const int *)vector;
+            AnnoyIndex<int, double, DotProduct, Kiss32Random> *index = (AnnoyIndex<int, double, DotProduct, Kiss32Random> *)indexPointer;
+            const double *vec = (const double *)vector;
             return index->add_item(i, vec);
         }
     }
@@ -92,38 +84,8 @@ bool C_add_item(int i, void* vector, char* dist_metric, char* dtype, const void*
 }
 
 bool C_build(int num_trees, char * dist_metric, char* dtype, const void* indexPointer) {
-    if (strcmp(dtype, "Float") == 0) {
-        if (strcmp(dist_metric, "euclidean") == 0) {
-            AnnoyIndex<int, float, Euclidean, Kiss32Random> *index = (AnnoyIndex<int, float, Euclidean, Kiss32Random> *)indexPointer;
-            return index->build(num_trees);
-        }
-        else if (strcmp(dist_metric, "manhattan") == 0) {
-            AnnoyIndex<int, float, Manhattan, Kiss32Random> *index = (AnnoyIndex<int, float, Manhattan, Kiss32Random> *)indexPointer;
-            return index->build(num_trees);
-        }
-        else if (strcmp(dist_metric, "dotProduct") == 0) {
-            AnnoyIndex<int, float, DotProduct, Kiss32Random> *index = (AnnoyIndex<int, float, DotProduct, Kiss32Random> *)indexPointer;
-            return index->build(num_trees);
-        }
-    } else if (strcmp(dtype, "int") == 0) {
-        if (strcmp(dist_metric, "euclidean") == 0) {
-            AnnoyIndex<int, int, Euclidean, Kiss32Random> *index = (AnnoyIndex<int, int, Euclidean, Kiss32Random> *)indexPointer;
-            return index->build(num_trees);
-        }
-        else if (strcmp(dist_metric, "manhattan") == 0) {
-            AnnoyIndex<int, int, Manhattan, Kiss32Random> *index = (AnnoyIndex<int, int, Manhattan, Kiss32Random> *)indexPointer;
-            return index->build(num_trees);
-        }
-        else if (strcmp(dist_metric, "hamming") == 0) {
-            AnnoyIndex<int, int, Hamming, Kiss32Random> *index = (AnnoyIndex<int, int, Hamming, Kiss32Random> *)indexPointer;
-            return index->build(num_trees);
-        }
-        else if (strcmp(dist_metric, "dotProduct") == 0) {
-            AnnoyIndex<int, int, DotProduct, Kiss32Random> *index = (AnnoyIndex<int, int, DotProduct, Kiss32Random> *)indexPointer;
-            return index->build(num_trees);
-        }
-    }
-    return false;
+    AnnoyIndex<int, float, Euclidean, Kiss32Random> *index = (AnnoyIndex<int, float, Euclidean, Kiss32Random> *)indexPointer;
+    return index->build(num_trees);
 }
 
 bool C_unbuild(const void* indexPointer) {
@@ -141,7 +103,7 @@ void C_unload(const void* indexPointer) {
     index->unload();
 }
 
-bool load(const char* filename, char* dist_metric, char* dtype, const void* indexPointer) {
+bool C_load(const char* filename, char* dist_metric, char* dtype, const void* indexPointer) {
     if (strcmp(dtype, "Float") == 0) {
         if (strcmp(dist_metric, "euclidean") == 0) {
             AnnoyIndex<int, float, Euclidean, Kiss32Random> *index = (AnnoyIndex<int, float, Euclidean, Kiss32Random> *)indexPointer;
@@ -155,21 +117,17 @@ bool load(const char* filename, char* dist_metric, char* dtype, const void* inde
             AnnoyIndex<int, float, DotProduct, Kiss32Random> *index = (AnnoyIndex<int, float, DotProduct, Kiss32Random> *)indexPointer;
             return index->load(filename);
         }
-    } else if (strcmp(dtype, "int") == 0) {
+    } else if (strcmp(dtype, "Double") == 0) {
         if (strcmp(dist_metric, "euclidean") == 0) {
-            AnnoyIndex<int, int, Euclidean, Kiss32Random> *index = (AnnoyIndex<int, int, Euclidean, Kiss32Random> *)indexPointer;
+            AnnoyIndex<int, double, Euclidean, Kiss32Random> *index = (AnnoyIndex<int, double, Euclidean, Kiss32Random> *)indexPointer;
             return index->load(filename);
         }
         else if (strcmp(dist_metric, "manhattan") == 0) {
-            AnnoyIndex<int, int, Manhattan, Kiss32Random> *index = (AnnoyIndex<int, int, Manhattan, Kiss32Random> *)indexPointer;
-            return index->load(filename);
-        }
-        else if (strcmp(dist_metric, "hamming") == 0) {
-            AnnoyIndex<int, int, Hamming, Kiss32Random> *index = (AnnoyIndex<int, int, Hamming, Kiss32Random> *)indexPointer;
+            AnnoyIndex<int, double, Manhattan, Kiss32Random> *index = (AnnoyIndex<int, double, Manhattan, Kiss32Random> *)indexPointer;
             return index->load(filename);
         }
         else if (strcmp(dist_metric, "dotProduct") == 0) {
-            AnnoyIndex<int, int, DotProduct, Kiss32Random> *index = (AnnoyIndex<int, int, DotProduct, Kiss32Random> *)indexPointer;
+            AnnoyIndex<int, double, DotProduct, Kiss32Random> *index = (AnnoyIndex<int, double, DotProduct, Kiss32Random> *)indexPointer;
             return index->load(filename);
         }
     }
@@ -194,25 +152,20 @@ void C_get_distance(int i, int j, void* result, char* dist_metric, char* dtype, 
             float dist = index->get_distance(i, j);
             memcpy(result, &dist, sizeof(dist));
         }
-    } else if (strcmp(dtype, "int") == 0) {
+    } else if (strcmp(dtype, "Double") == 0) {
         if (strcmp(dist_metric, "euclidean") == 0) {
-            AnnoyIndex<int, int, Euclidean, Kiss32Random> *index = (AnnoyIndex<int, int, Euclidean, Kiss32Random> *)indexPointer;
-            float dist = index->get_distance(i, j);
+            AnnoyIndex<int, double, Euclidean, Kiss32Random> *index = (AnnoyIndex<int, double, Euclidean, Kiss32Random> *)indexPointer;
+            double dist = index->get_distance(i, j);
             memcpy(result, &dist, sizeof(dist));
         }
         else if (strcmp(dist_metric, "manhattan") == 0) {
-            AnnoyIndex<int, int, Manhattan, Kiss32Random> *index = (AnnoyIndex<int, int, Manhattan, Kiss32Random> *)indexPointer;
-            float dist = index->get_distance(i, j);
-            memcpy(result, &dist, sizeof(dist));
-        }
-        else if (strcmp(dist_metric, "hamming") == 0) {
-            AnnoyIndex<int, int, Hamming, Kiss32Random> *index = (AnnoyIndex<int, int, Hamming, Kiss32Random> *)indexPointer;
-            float dist = index->get_distance(i, j);
+            AnnoyIndex<int, double, Manhattan, Kiss32Random> *index = (AnnoyIndex<int, double, Manhattan, Kiss32Random> *)indexPointer;
+            double dist = index->get_distance(i, j);
             memcpy(result, &dist, sizeof(dist));
         }
         else if (strcmp(dist_metric, "dotProduct") == 0) {
-            AnnoyIndex<int, int, DotProduct, Kiss32Random> *index = (AnnoyIndex<int, int, DotProduct, Kiss32Random> *)indexPointer;
-            float dist = index->get_distance(i, j);
+            AnnoyIndex<int, double, DotProduct, Kiss32Random> *index = (AnnoyIndex<int, double, DotProduct, Kiss32Random> *)indexPointer;
+            double dist = index->get_distance(i, j);
             memcpy(result, &dist, sizeof(dist));
         }
     }
@@ -240,24 +193,20 @@ void C_get_nns_by_item(int item, int n, int search_k, int* results, void* distan
             results[i] = res[i];
             distancesBuffer[i] = dis[i];
         }
-    } else if (strcmp(dtype, "int") == 0) {
+    } else if (strcmp(dtype, "Double") == 0) {
         std::vector<int> res;
-        std::vector<int> dis;
-        int* distancesBuffer = (int *)distances;
+        std::vector<double> dis;
+        double* distancesBuffer = (double *)distances;
         if (strcmp(dist_metric, "euclidean") == 0) {
-            AnnoyIndex<int, int, Euclidean, Kiss32Random> *index = (AnnoyIndex<int, int, Euclidean, Kiss32Random> *)indexPointer;
+            AnnoyIndex<int, double, Euclidean, Kiss32Random> *index = (AnnoyIndex<int, double, Euclidean, Kiss32Random> *)indexPointer;
             index->get_nns_by_item(item, n, search_k, &res, &dis);
         }
         else if (strcmp(dist_metric, "manhattan") == 0) {
-            AnnoyIndex<int, int, Manhattan, Kiss32Random> *index = (AnnoyIndex<int, int, Manhattan, Kiss32Random> *)indexPointer;
-            index->get_nns_by_item(item, n, search_k, &res, &dis);
-        }
-        else if (strcmp(dist_metric, "hamming") == 0) {
-            AnnoyIndex<int, int, Hamming, Kiss32Random> *index = (AnnoyIndex<int, int, Hamming, Kiss32Random> *)indexPointer;
+            AnnoyIndex<int, double, Manhattan, Kiss32Random> *index = (AnnoyIndex<int, double, Manhattan, Kiss32Random> *)indexPointer;
             index->get_nns_by_item(item, n, search_k, &res, &dis);
         }
         else if (strcmp(dist_metric, "dotProduct") == 0) {
-            AnnoyIndex<int, int, DotProduct, Kiss32Random> *index = (AnnoyIndex<int, int, DotProduct, Kiss32Random> *)indexPointer;
+            AnnoyIndex<int, double, DotProduct, Kiss32Random> *index = (AnnoyIndex<int, double, DotProduct, Kiss32Random> *)indexPointer;
             index->get_nns_by_item(item, n, search_k, &res, &dis);
         }
         for (int i = 0; i < res.size(); i++){
@@ -290,41 +239,27 @@ void C_get_nns_by_vector(void* vector, int n, int search_k, int* results, void* 
             results[i] = res[i];
             distancesBuffer[i] = dis[i];
         }
-    } else if (strcmp(dtype, "int") == 0) {
+    } else if (strcmp(dtype, "Double") == 0) {
         std::vector<int> res;
-        std::vector<int> dis;
-        const int *vec = (int *)vector;
-        int* distancesBuffer = (int *)distances;
+        std::vector<double> dis;
+        const double *vec = (double *)vector;
+        double* distancesBuffer = (double *)distances;
         if (strcmp(dist_metric, "euclidean") == 0) {
-            AnnoyIndex<int, int, Euclidean, Kiss32Random> *index = (AnnoyIndex<int, int, Euclidean, Kiss32Random> *)indexPointer;
+            AnnoyIndex<int, double, Euclidean, Kiss32Random> *index = (AnnoyIndex<int, double, Euclidean, Kiss32Random> *)indexPointer;
             index->get_nns_by_vector(vec, n, search_k, &res, &dis);
         }
         else if (strcmp(dist_metric, "manhattan") == 0) {
-            AnnoyIndex<int, int, Manhattan, Kiss32Random> *index = (AnnoyIndex<int, int, Manhattan, Kiss32Random> *)indexPointer;
-            index->get_nns_by_vector(vec, n, search_k, &res, &dis);
-        }
-        else if (strcmp(dist_metric, "hamming") == 0) {
-            AnnoyIndex<int, int, Hamming, Kiss32Random> *index = (AnnoyIndex<int, int, Hamming, Kiss32Random> *)indexPointer;
+            AnnoyIndex<int, double, Manhattan, Kiss32Random> *index = (AnnoyIndex<int, double, Manhattan, Kiss32Random> *)indexPointer;
             index->get_nns_by_vector(vec, n, search_k, &res, &dis);
         }
         else if (strcmp(dist_metric, "dotProduct") == 0) {
-            AnnoyIndex<int, int, DotProduct, Kiss32Random> *index = (AnnoyIndex<int, int, DotProduct, Kiss32Random> *)indexPointer;
+            AnnoyIndex<int, double, DotProduct, Kiss32Random> *index = (AnnoyIndex<int, double, DotProduct, Kiss32Random> *)indexPointer;
             index->get_nns_by_vector(vec, n, search_k, &res, &dis);
         }
         for (int i = 0; i < res.size(); i++){
             results[i] = res[i];
             distancesBuffer[i] = dis[i];
         }
-    }
-    AnnoyIndex<int, float, Euclidean, Kiss32Random> *index = (AnnoyIndex<int, float, Euclidean, Kiss32Random> *)indexPointer;
-    const float *vec = (float *)vector;
-    std::vector<int> res;
-    std::vector<float> dis;
-    index->get_nns_by_vector(vec, n, search_k, &res, &dis);
-    float* distancesBuffer = (float *)distances;
-    for (int i = 0; i < res.size(); i++){
-        results[i] = res[i];
-        distancesBuffer[i] = dis[i];
     }
 }
 
@@ -364,22 +299,18 @@ void C_get_item(int item, void* vector, char* dist_metric, char* dtype, const vo
             AnnoyIndex<int, float, DotProduct, Kiss32Random> *index = (AnnoyIndex<int, float, DotProduct, Kiss32Random> *)indexPointer;
             index->get_item(item, vec);
         }
-    } else if (strcmp(dtype, "int") == 0) {
-        int* vec = (int *)vector;
+    } else if (strcmp(dtype, "Double") == 0) {
+        double* vec = (double *)vector;
         if (strcmp(dist_metric, "euclidean") == 0) {
-            AnnoyIndex<int, int, Euclidean, Kiss32Random> *index = (AnnoyIndex<int, int, Euclidean, Kiss32Random> *)indexPointer;
+            AnnoyIndex<int, double, Euclidean, Kiss32Random> *index = (AnnoyIndex<int, double, Euclidean, Kiss32Random> *)indexPointer;
             index->get_item(item, vec);
         }
         else if (strcmp(dist_metric, "manhattan") == 0) {
-            AnnoyIndex<int, int, Manhattan, Kiss32Random> *index = (AnnoyIndex<int, int, Manhattan, Kiss32Random> *)indexPointer;
-            index->get_item(item, vec);
-        }
-        else if (strcmp(dist_metric, "hamming") == 0) {
-            AnnoyIndex<int, int, Hamming, Kiss32Random> *index = (AnnoyIndex<int, int, Hamming, Kiss32Random> *)indexPointer;
+            AnnoyIndex<int, double, Manhattan, Kiss32Random> *index = (AnnoyIndex<int, double, Manhattan, Kiss32Random> *)indexPointer;
             index->get_item(item, vec);
         }
         else if (strcmp(dist_metric, "dotProduct") == 0) {
-            AnnoyIndex<int, int, DotProduct, Kiss32Random> *index = (AnnoyIndex<int, int, DotProduct, Kiss32Random> *)indexPointer;
+            AnnoyIndex<int, double, DotProduct, Kiss32Random> *index = (AnnoyIndex<int, double, DotProduct, Kiss32Random> *)indexPointer;
             index->get_item(item, vec);
         }
     }

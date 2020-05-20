@@ -9,17 +9,14 @@
 import Foundation
 import CAnnoyWrapper
 
-
 public class AnnoyIndex<T: AnnoyOperable> {
     
     public enum DistanceMetric: String{
         case euclidean
         case manhattan
-        case hamming
         case dotProduct
     }
 
-    
     //MARK: - Properties
     private let indexPointer: UnsafeRawPointer
     public private(set) var itemLength: Int
@@ -57,6 +54,7 @@ public class AnnoyIndex<T: AnnoyOperable> {
         indexPointer = C_initializeAnnoyIndex(Int32(itemLength), &distanceMetric, &dataType)!
     }
     
+    
     deinit {
         C_unload(indexPointer)
         C_deleteAnnoyIndex(indexPointer)
@@ -68,7 +66,6 @@ public class AnnoyIndex<T: AnnoyOperable> {
      - Parameters:
         - index: The index (integer) to assign to the item.
         - vector: Array representing the feature vector for the item.
-     
      */
     
     public func addItem(index: Int, vector: inout [T]) throws {
@@ -85,29 +82,25 @@ public class AnnoyIndex<T: AnnoyOperable> {
         }
     }
     
-    public func addItems(indices: [Int]? = nil, items: inout [[T]]) throws {
-        if let indices = indices {
-            guard indices.count == items.count else {
-                let message = "indices.count (\(indices.count)) != items.count (\(items.count)) "
-                throw AnnoyIndexError.mismatchedArrayLength(message: message)
-            }
-            for (i, index) in indices.enumerated() {
-                try? self.addItem(index: index, vector: &items[i])
-            }
-        } else {
-            for (index, _ ) in items.enumerated() {
-                try? self.addItem(index: index, vector: &items[index])
-            }
+    public func addItems(items: inout [[T]]) throws {
+        let beginningNumItems = self.numberOfItems
+        for (index, _) in items.enumerated() {
+            try? self.addItem(index: index + beginningNumItems, vector: &items[index])
         }
     }
     
-    public func build(numTrees: Int) -> Bool {
+    public func build(numTrees: Int) throws {
         let success = C_build(Int32(numTrees), &distanceMetric, &dataType, indexPointer)
-        return success
+        if !success {
+            throw AnnoyIndexError.buildFailed
+        }
     }
     
-    public func unbuild() -> Bool{
-        return C_unbuild(indexPointer)
+    public func unbuild() throws {
+        let success = C_unbuild(indexPointer)
+        if !success {
+            throw AnnoyIndexError.unbuildFailed
+        }
     }
     
     public func save(url: URL) throws {
@@ -123,54 +116,64 @@ public class AnnoyIndex<T: AnnoyOperable> {
     public func unload() {
         C_unload(indexPointer)
     }
+    
+    public func load(url: URL) throws {
+        guard let filenameCString = url.path.cString(using: .utf8) else {
+            return
+        }
+        let success = C_load(filenameCString, &distanceMetric, &dataType, indexPointer)
+        if !success {
+            throw AnnoyIndexError.saveFailed
+        }
+        
+    }
         
     public func getDistance(item1: Int, item2: Int) -> T? {
-        if T.self is Float.Type {
+        if (item1 >= self.numberOfItems) || (item2 >= self.numberOfItems) { return nil }
+        switch T.self {
+        case is Float.Type:
             var result = Float(-1.0)
             C_get_distance(Int32(item1), Int32(item2),&result, &distanceMetric, &dataType, indexPointer)
             return result as? T
-        }
-        if T.self is Int32.Type {
+        case is Int32.Type:
             var result = Int32(1)
             C_get_distance(Int32(item1), Int32(item2),&result, &distanceMetric, &dataType, indexPointer)
             return result as? T
+        default:
+            return nil
         }
-        return nil
     }
     
-    public func getNNSFor(item: Int, neighbors: Int, search_k: Int = -1, distance: Bool = true) -> (indices: [Int32], distances: [Any]?) {
-        var results: [Int32] = Array(repeating: -1, count: neighbors)
-        
-        if T.self is Float.Type {
+    public func getNNsForItem(item: Int, neighbors: Int, search_k: Int = -1) -> (indices: [Int], distances: [T])? {
+        var indices: [Int32] = Array(repeating: -1, count: neighbors)
+        switch T.self {
+        case is Float.Type:
             var distances = Array(repeating: Float(-1.0), count: neighbors)
-            C_get_nns_by_item(Int32(item), Int32(neighbors), Int32(search_k), &results, &distances, &distanceMetric, &dataType, indexPointer)
-            return (results, distances)
-        }
-        if T.self is Int32.Type {
+            C_get_nns_by_item(Int32(item), Int32(neighbors), Int32(search_k), &indices, &distances, &distanceMetric, &dataType, indexPointer)
+            return (indices.toInt(), distances as! [T])
+        case is Int32.Type:
             var distances = Array(repeating: Int32(-1.0), count: neighbors)
-            C_get_nns_by_item(Int32(item), Int32(neighbors), Int32(search_k), &results, &distances, &distanceMetric, &dataType, indexPointer)
-            return (results, distances)
+            C_get_nns_by_item(Int32(item), Int32(neighbors), Int32(search_k), &indices, &distances, &distanceMetric, &dataType, indexPointer)
+            return (indices.toInt(), distances as! [T])
+        default:
+            return nil
         }
-        
-        return (results, nil)
     }
     
-    public func getNNSFor(vector: inout [T], neighbors: Int, search_k: Int = -1, distance: Bool = true) -> (indices: [Int32], distances: [Any]?) {
+    public func getNNsForVector(vector: inout [T], neighbors: Int, search_k: Int = -1) -> (indices: [Int], distances: [T])? {
         var results: [Int32] = Array(repeating: -1, count: neighbors)
-        
-        if T.self is Float.Type {
+        switch T.self {
+        case is Float.Type:
             var distances = Array(repeating: Float(-1.0), count: neighbors)
             C_get_nns_by_vector(&vector, Int32(neighbors), Int32(search_k), &results, &distances, &distanceMetric, &dataType, indexPointer)
-            return (results, distances)
-        }
-        if T.self is Int32.Type {
+            return (results.toInt(), distances as! [T])
+        case is Int32.Type:
             var distances = Array(repeating: Int32(-1.0), count: neighbors)
             C_get_nns_by_vector(&vector, Int32(neighbors), Int32(search_k), &results, &distances, &distanceMetric, &dataType, indexPointer)
-            return (results, distances)
+            return (results.toInt(), distances as! [T])
+        default:
+            return nil
         }
-        
-        return (results, nil)
-        //return (results, distances)
     }
     
     public func setVerbos(boolVal: Bool) {
@@ -198,7 +201,12 @@ public class AnnoyIndex<T: AnnoyOperable> {
     public func onDiskBuild(url: URL) {
         guard var filenameCString = url.path.cString(using: .utf8) else { return }
         C_on_disk_build(&filenameCString, indexPointer)
-        
     }
     
+}
+
+extension Array where Element: BinaryInteger {
+    func toInt() -> [Int] {
+        return self.map({Int($0)})
+    }
 }
