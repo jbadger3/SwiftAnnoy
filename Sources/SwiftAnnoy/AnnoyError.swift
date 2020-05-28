@@ -13,6 +13,7 @@ public enum AnnoyIndexError: Error, LocalizedError {
     case buildFailed
     case unbuildFailed
     case saveFailed
+    case loadFailed
     
     public var errorDescription: String? {
         switch self {
@@ -26,6 +27,8 @@ public enum AnnoyIndexError: Error, LocalizedError {
             return nil
         case .saveFailed:
             return nil //Errors should be printed to stdout by Annoy C++ lib
+        case .loadFailed:
+            return nil
         }
     }
 }
