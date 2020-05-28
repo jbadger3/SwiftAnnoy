@@ -25,6 +25,10 @@ const void * C_initializeAnnoyIndex(int f, char* dist_metric, char* dtype) {
             AnnoyIndex<int, float, DotProduct, Kiss32Random> *index = new AnnoyIndex<int, float, DotProduct, Kiss32Random>(f);
             return (void *)index;
         }
+        else if (strcmp(dist_metric, "angular") == 0) {
+            AnnoyIndex<int, float, Angular, Kiss32Random> *index = new AnnoyIndex<int, float, Angular, Kiss32Random>(f);
+            return (void *)index;
+        }
     } else if (strcmp(dtype, "Double") == 0) {
         if (strcmp(dist_metric, "euclidean") == 0) {
             AnnoyIndex<int, double, Euclidean, Kiss32Random> *index = new AnnoyIndex<int, double, Euclidean, Kiss32Random>(f);
@@ -36,6 +40,10 @@ const void * C_initializeAnnoyIndex(int f, char* dist_metric, char* dtype) {
         }
         else if (strcmp(dist_metric, "dotProduct") == 0) {
             AnnoyIndex<int, double, DotProduct, Kiss32Random> *index = new AnnoyIndex<int, double, DotProduct, Kiss32Random>(f);
+            return (void *)index;
+        }
+        else if (strcmp(dist_metric, "angular") == 0) {
+            AnnoyIndex<int, double, Angular, Kiss32Random> *index = new AnnoyIndex<int, double, Angular, Kiss32Random>(f);
             return (void *)index;
         }
     }
@@ -63,6 +71,11 @@ bool C_add_item(int i, void* vector, char* dist_metric, char* dtype, const void*
             const float *vec = (const float *)vector;
             return index->add_item(i, vec);
         }
+        else if (strcmp(dist_metric, "angular") == 0) {
+            AnnoyIndex<int, float, Angular, Kiss32Random> *index = (AnnoyIndex<int, float, Angular, Kiss32Random> *)indexPointer;
+            const float *vec = (const float *)vector;
+            return index->add_item(i, vec);
+        }
     } else if (strcmp(dtype, "Double") == 0) {
         if (strcmp(dist_metric, "euclidean") == 0) {
             AnnoyIndex<int, double, Euclidean, Kiss32Random> *index = (AnnoyIndex<int, double, Euclidean, Kiss32Random> *)indexPointer;
@@ -76,6 +89,11 @@ bool C_add_item(int i, void* vector, char* dist_metric, char* dtype, const void*
         }
         else if (strcmp(dist_metric, "dotProduct") == 0) {
             AnnoyIndex<int, double, DotProduct, Kiss32Random> *index = (AnnoyIndex<int, double, DotProduct, Kiss32Random> *)indexPointer;
+            const double *vec = (const double *)vector;
+            return index->add_item(i, vec);
+        }
+        else if (strcmp(dist_metric, "angular") == 0) {
+            AnnoyIndex<int, double, Angular, Kiss32Random> *index = (AnnoyIndex<int, double, Angular, Kiss32Random> *)indexPointer;
             const double *vec = (const double *)vector;
             return index->add_item(i, vec);
         }
@@ -93,7 +111,7 @@ bool C_unbuild(const void* indexPointer) {
     return index->unbuild();
 }
 
-bool C_save(const char* filename, const void* indexPointer) {
+bool C_save(const char* filename, bool prefault, const void* indexPointer) {
     AnnoyIndex<int, float, Euclidean, Kiss32Random> *index = (AnnoyIndex<int, float, Euclidean, Kiss32Random> *)indexPointer;
     return index->save(filename);
 }
@@ -117,6 +135,10 @@ bool C_load(const char* filename, char* dist_metric, char* dtype, const void* in
             AnnoyIndex<int, float, DotProduct, Kiss32Random> *index = (AnnoyIndex<int, float, DotProduct, Kiss32Random> *)indexPointer;
             return index->load(filename);
         }
+        else if (strcmp(dist_metric, "angular") == 0) {
+            AnnoyIndex<int, float, Angular, Kiss32Random> *index = (AnnoyIndex<int, float, Angular, Kiss32Random> *)indexPointer;
+            return index->load(filename);
+        }
     } else if (strcmp(dtype, "Double") == 0) {
         if (strcmp(dist_metric, "euclidean") == 0) {
             AnnoyIndex<int, double, Euclidean, Kiss32Random> *index = (AnnoyIndex<int, double, Euclidean, Kiss32Random> *)indexPointer;
@@ -128,6 +150,10 @@ bool C_load(const char* filename, char* dist_metric, char* dtype, const void* in
         }
         else if (strcmp(dist_metric, "dotProduct") == 0) {
             AnnoyIndex<int, double, DotProduct, Kiss32Random> *index = (AnnoyIndex<int, double, DotProduct, Kiss32Random> *)indexPointer;
+            return index->load(filename);
+        }
+        else if (strcmp(dist_metric, "angular") == 0) {
+            AnnoyIndex<int, double, Angular, Kiss32Random> *index = (AnnoyIndex<int, double, Angular, Kiss32Random> *)indexPointer;
             return index->load(filename);
         }
     }
@@ -152,6 +178,11 @@ void C_get_distance(int i, int j, void* result, char* dist_metric, char* dtype, 
             float dist = index->get_distance(i, j);
             memcpy(result, &dist, sizeof(dist));
         }
+        else if (strcmp(dist_metric, "angular") == 0) {
+            AnnoyIndex<int, float, Angular, Kiss32Random> *index = (AnnoyIndex<int, float, Angular, Kiss32Random> *)indexPointer;
+            float dist = index->get_distance(i, j);
+            memcpy(result, &dist, sizeof(dist));
+        }
     } else if (strcmp(dtype, "Double") == 0) {
         if (strcmp(dist_metric, "euclidean") == 0) {
             AnnoyIndex<int, double, Euclidean, Kiss32Random> *index = (AnnoyIndex<int, double, Euclidean, Kiss32Random> *)indexPointer;
@@ -165,6 +196,11 @@ void C_get_distance(int i, int j, void* result, char* dist_metric, char* dtype, 
         }
         else if (strcmp(dist_metric, "dotProduct") == 0) {
             AnnoyIndex<int, double, DotProduct, Kiss32Random> *index = (AnnoyIndex<int, double, DotProduct, Kiss32Random> *)indexPointer;
+            double dist = index->get_distance(i, j);
+            memcpy(result, &dist, sizeof(dist));
+        }
+        else if (strcmp(dist_metric, "angular") == 0) {
+            AnnoyIndex<int, double, Angular, Kiss32Random> *index = (AnnoyIndex<int, double, Angular, Kiss32Random> *)indexPointer;
             double dist = index->get_distance(i, j);
             memcpy(result, &dist, sizeof(dist));
         }
@@ -189,6 +225,10 @@ void C_get_nns_by_item(int item, int n, int search_k, int* results, void* distan
             AnnoyIndex<int, float, DotProduct, Kiss32Random> *index = (AnnoyIndex<int, float, DotProduct, Kiss32Random> *)indexPointer;
             index->get_nns_by_item(item, n, search_k, &res, &dis);
         }
+        else if (strcmp(dist_metric, "angular") == 0) {
+            AnnoyIndex<int, float, Angular, Kiss32Random> *index = (AnnoyIndex<int, float, Angular, Kiss32Random> *)indexPointer;
+            index->get_nns_by_item(item, n, search_k, &res, &dis);
+        }
         for (int i = 0; i < res.size(); i++){
             results[i] = res[i];
             distancesBuffer[i] = dis[i];
@@ -207,6 +247,10 @@ void C_get_nns_by_item(int item, int n, int search_k, int* results, void* distan
         }
         else if (strcmp(dist_metric, "dotProduct") == 0) {
             AnnoyIndex<int, double, DotProduct, Kiss32Random> *index = (AnnoyIndex<int, double, DotProduct, Kiss32Random> *)indexPointer;
+            index->get_nns_by_item(item, n, search_k, &res, &dis);
+        }
+        else if (strcmp(dist_metric, "angular") == 0) {
+            AnnoyIndex<int, double, Angular, Kiss32Random> *index = (AnnoyIndex<int, double, Angular, Kiss32Random> *)indexPointer;
             index->get_nns_by_item(item, n, search_k, &res, &dis);
         }
         for (int i = 0; i < res.size(); i++){
@@ -235,6 +279,10 @@ void C_get_nns_by_vector(void* vector, int n, int search_k, int* results, void* 
             AnnoyIndex<int, float, DotProduct, Kiss32Random> *index = (AnnoyIndex<int, float, DotProduct, Kiss32Random> *)indexPointer;
             index->get_nns_by_vector(vec, n, search_k, &res, &dis);
         }
+        else if (strcmp(dist_metric, "angular") == 0) {
+            AnnoyIndex<int, float, Angular, Kiss32Random> *index = (AnnoyIndex<int, float, Angular, Kiss32Random> *)indexPointer;
+            index->get_nns_by_vector(vec, n, search_k, &res, &dis);
+        }
         for (int i = 0; i < res.size(); i++){
             results[i] = res[i];
             distancesBuffer[i] = dis[i];
@@ -254,6 +302,10 @@ void C_get_nns_by_vector(void* vector, int n, int search_k, int* results, void* 
         }
         else if (strcmp(dist_metric, "dotProduct") == 0) {
             AnnoyIndex<int, double, DotProduct, Kiss32Random> *index = (AnnoyIndex<int, double, DotProduct, Kiss32Random> *)indexPointer;
+            index->get_nns_by_vector(vec, n, search_k, &res, &dis);
+        }
+        else if (strcmp(dist_metric, "angular") == 0) {
+            AnnoyIndex<int, double, Angular, Kiss32Random> *index = (AnnoyIndex<int, double, Angular, Kiss32Random> *)indexPointer;
             index->get_nns_by_vector(vec, n, search_k, &res, &dis);
         }
         for (int i = 0; i < res.size(); i++){
@@ -299,6 +351,10 @@ void C_get_item(int item, void* vector, char* dist_metric, char* dtype, const vo
             AnnoyIndex<int, float, DotProduct, Kiss32Random> *index = (AnnoyIndex<int, float, DotProduct, Kiss32Random> *)indexPointer;
             index->get_item(item, vec);
         }
+        else if (strcmp(dist_metric, "angular") == 0) {
+            AnnoyIndex<int, float, Angular, Kiss32Random> *index = (AnnoyIndex<int, float, Angular, Kiss32Random> *)indexPointer;
+            index->get_item(item, vec);
+        }
     } else if (strcmp(dtype, "Double") == 0) {
         double* vec = (double *)vector;
         if (strcmp(dist_metric, "euclidean") == 0) {
@@ -311,6 +367,10 @@ void C_get_item(int item, void* vector, char* dist_metric, char* dtype, const vo
         }
         else if (strcmp(dist_metric, "dotProduct") == 0) {
             AnnoyIndex<int, double, DotProduct, Kiss32Random> *index = (AnnoyIndex<int, double, DotProduct, Kiss32Random> *)indexPointer;
+            index->get_item(item, vec);
+        }
+        else if (strcmp(dist_metric, "angular") == 0) {
+            AnnoyIndex<int, double, Angular, Kiss32Random> *index = (AnnoyIndex<int, double, Angular, Kiss32Random> *)indexPointer;
             index->get_item(item, vec);
         }
     }

@@ -21,7 +21,7 @@ const void * C_initializeAnnoyIndex(int f, char* dist_metric, char* dtype);
 bool C_add_item(int i, void* vector, char* dist_metric, char* dtype, const void* indexPointer);
 bool C_build(int num_trees, char* dist_metric, char* dtype, const void* indexPointer);
 bool C_unbuild(const void* indexPointer);
-bool C_save(const char* filename, const void* indexPointer);
+bool C_save(const char* filename, bool prefault, const void* indexPointer);
 void C_unload(const void* indexPointer);
 bool C_load(const char* filename, char* dist_metric, char* dtype, const void* indexPointer);
 void C_get_distance(int i, int j, void* result, char* dist_metric, char* dtype, const void* indexPointer);
