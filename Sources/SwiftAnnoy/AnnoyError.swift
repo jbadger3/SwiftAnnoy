@@ -7,6 +7,19 @@
 
 import Foundation
 
+/**
+ Errors thrown by AnnoyIndex.
+ 
+ *values*
+ 
+ `invalidVectorLenght`
+ `addItemFailed`
+ `buildFailed`
+ `unbuildFailed`
+ `saveFailed`
+ `loadFailed`
+ */
+
 public enum AnnoyIndexError: Error, LocalizedError {
     case invalidVectorLength(message: String)
     case addItemFailed
