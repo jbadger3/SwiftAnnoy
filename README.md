@@ -29,7 +29,7 @@ If you are using Xcode you can do the following:
 5. Click Finish.
 
 ## Usage
-Using SwiftAnnoy is fairly straitforward.  You can follow the code snippets below to get started.
+Using SwiftAnnoy is fairly straitforward.  You can follow the code snippets below to get started or have a look at the Jazzy generated [docs](https://jbadger3.github.io/SwiftAnnoy/)
 
 ### Create an index
   First, create an `AnnoyIndex<T>`  as in:
@@ -76,9 +76,6 @@ print(results2)
 "Optional((indices: [2, 0, 1], distances: [0.0, 3.605551275463989, 3.605551275463989]))"
 ```
 
-
-
-
 ## Contributing
 Improvements and suggestions are welcome.  Have a look at the TODO list below or open up an issue for other areas of improvement.
 
@@ -87,7 +84,7 @@ Improvements and suggestions are welcome.  Have a look at the TODO list below or
 ### Features
 - [ ] hamming distance
 - [ ] bounds checking for getItem, getNNsForItem, and getNNsForVector
-- [ ] 
+- [ ] half-precision support
 
 ### Unit testing
 - [ ] build
