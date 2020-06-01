@@ -33,14 +33,14 @@ Using SwiftAnnoy is fairly straitforward.  You can follow the code snippets belo
 
 ### Create an index
   First, create an `AnnoyIndex<T>`  as in:
-```
+```swift
 let index = AnnoyIndex<Double>(itemLength: 2, metric: .euclidean)
 ```
 Currently supported types are `Float` and `Double`.
 
 ### Adding items
 Next, add some data to your index.  There are two functions that can be used to populate an index: `addItem` and `addItems`.
-```
+```swift
 var item0 = [1.0, 1.0]
 var item1 = [3.0, 4.0]
 var item2 = [6.0, 8.0]
@@ -56,14 +56,14 @@ Note:  Annoy expects indices in chronological order from 0...n-1.  If you need/i
 
 ### Build the index
 In order to run queries on an `AnnoyIndex` the index must first be built.
-```
+```swift
 try? index.build(numTrees: 1)
 ```
 The argument `numTrees` specifies the number of trees you want Annoy to use to construct the index.  The more trees you include in the index the more accurate the search results will be, but it will take longer to build, take up more space, and require more time to search.  Experiment with this parameter to optimize the tradeoffs.
 
 ### Running queries
 An `AnnoyIndex`  can be queried using either an item index or a vector.
-```
+```swift
 // by item
 let results =  index.getNNsForItem(item: 3, neighbors: 3)
 print(results)
