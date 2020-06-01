@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>  Reference</title>
+    <link rel="stylesheet" type="text/css" href="css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="css/highlight.css" />
+    <meta charset='utf-8'>
+    <script src="js/jquery.min.js" defer></script>
+    <script src="js/jazzy.js" defer></script>
+    
+  </head>
+  <body>
+    <a title="  Reference"></a>
+    <header>
+      <div class="content-wrapper">
+        <p><a href="index.html"> Docs</a> (83% documented)</p>
+      </div>
+    </header>
+    <div class="content-wrapper">
+      <p id="breadcrumbs">
+        <a href="index.html"> Reference</a>
+        <img id="carat" src="img/carat.png" />
+          Reference
+      </p>
+    </div>
+    <div class="content-wrapper">
+      <nav class="sidebar">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a href="Classes.html">Classes</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="Classes/AnnoyIndex.html">AnnoyIndex</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Classes/AnnoyIndex/DistanceMetric.html">– DistanceMetric</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="Enums.html">Enumerations</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="Enums/AnnoyIndexError.html">AnnoyIndexError</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="Extensions.html">Extensions</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="Extensions.html#/s:Sd">Double</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Extensions.html#/s:Sf">Float</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="Protocols.html">Protocols</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="Protocols.html#/s:10SwiftAnnoy0B8OperableP">AnnoyOperable</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+        <section>
+          <section class="section">
+            
+            <h1 id='swiftannoy' class='heading'>SwiftAnnoy</h1>
+
+<p>SwiftAnnoy provides an interface (bindings) to the <a href="https://github.com/spotify/annoy">Annoy</a> (Approximate Nearest Neighbors Oh Yeah) C++ library.</p>
+<h3 id='supported-data-types' class='heading'>Supported data types</h3>
+
+<ul>
+<li>[ ] Float16 (half-precision)</li>
+<li>[x] Float (32 bit)</li>
+<li>[x] Double (64 bit)</li>
+</ul>
+<h3 id='supported-distance-metrics-similarity-measures' class='heading'>Supported distance metrics (similarity measures)</h3>
+
+<ul>
+<li>[x] angular</li>
+<li>[x] dotProcut</li>
+<li>[x] euclidean</li>
+<li>[ ] hamming</li>
+<li>[x] manhattan</li>
+</ul>
+<h2 id='background' class='heading'>Background</h2>
+
+<p>Nearest neighbors search (NNS) algorithms are used in a variety of tasks that include classification, clustering, image retreval, and recommendation.  The fundamental task in NNS is to look for points (examples) in a data set that are closest to a given query using some metric of distance (manhattan, euclidean, etc.).  Brute force search quickly becomes inefficient as the size of a dataset and number of dimensions in the data grow (see <a href="https://en.wikipedia.org/wiki/Curse_of_dimensionality">the curse of dimensionality</a>).  Searching can be made more efficient by intelligent indexing (k-d trees, ball tree, etc.), but even here large datasets quickly lead to large indexes, memory constraints, and suboptimal search speed.</p>
+
+<p>Approximate nearest neighbors algorithms make a trade-off in reduced accuracy for improved query performance.  Annoy offers benefits in both speed and memory footprint (indexes are memory mapped) that make it an attractive alternative to brute force search and exact nearest neighbor methods.</p>
+<h2 id='installation' class='heading'>Installation</h2>
+
+<p>Swift Package Manager (SPM)
+If you are using Xcode you can do the following:</p>
+
+<ol>
+<li>Select File &gt; Swift Packages &gt; Add Package Dependency.</li>
+<li>copy and paste <a href="https://github.com/jbadger3/SwiftAnnoy">https://github.com/jbadger3/SwiftAnnoy</a> into the search URL</li>
+<li>Select SwiftAnnoy and click next.</li>
+<li>Choose a rule for dependency management.  Click next.</li>
+<li>Click Finish.</li>
+</ol>
+<h2 id='usage' class='heading'>Usage</h2>
+
+<p>Using SwiftAnnoy is fairly straitforward.  You can follow the code snippets below to get started.</p>
+<h3 id='create-an-index' class='heading'>Create an index</h3>
+
+<p>First, create an <code><a href="Classes/AnnoyIndex.html">AnnoyIndex&lt;T&gt;</a></code>  as in:</p>
+<pre class="highlight plaintext"><code>let index = AnnoyIndex&lt;Double&gt;(itemLength: 2, metric: .euclidean)
+</code></pre>
+
+<p>Currently supported types are <code>Float</code> and <code>Double</code>.</p>
+<h3 id='adding-items' class='heading'>Adding items</h3>
+
+<p>Next, add some data to your index.  There are two functions that can be used to populate an index: <code>addItem</code> and <code>addItems</code>.</p>
+<pre class="highlight plaintext"><code>var item0 = [1.0, 1.0]
+var item1 = [3.0, 4.0]
+var item2 = [6.0, 8.0]
+var items = [[item0, item1, item2]]
+
+// add one item
+try? index.addItem(index: 0, vector: &amp;item0)
+
+// add multple items
+try? index.addItems(items: &amp;items)
+</code></pre>
+
+<p>Note:  Annoy expects indices in chronological order from 0&hellip;n-1.  If you need/intend to use some other id numbering system create your own mapping as memory will be allocated for max(id) + 1 items.</p>
+<h3 id='build-the-index' class='heading'>Build the index</h3>
+
+<p>In order to run queries on an <code><a href="Classes/AnnoyIndex.html">AnnoyIndex</a></code> the index must first be built.</p>
+<pre class="highlight plaintext"><code>try? index.build(numTrees: 1)
+</code></pre>
+
+<p>The argument <code>numTrees</code> specifies the number of trees you want Annoy to use to construct the index.  The more trees you include in the index the more accurate the search results will be, but it will take longer to build, take up more space, and require more time to search.  Experiment with this parameter to optimize the tradeoffs.</p>
+<h3 id='running-queries' class='heading'>Running queries</h3>
+
+<p>An <code><a href="Classes/AnnoyIndex.html">AnnoyIndex</a></code>  can be queried using either an item index or a vector.</p>
+<pre class="highlight plaintext"><code>// by item
+let results =  index.getNNsForItem(item: 3, neighbors: 3)
+print(results)
+"Optional((indices: [3, 2, 0], distances: [0.0, 5.0, 8.602325267042627]))"
+
+// by vector
+var vector = [3.0, 4.0]
+let results2 = index.getNNsForVector(vector: &amp;vector, neighbors: 3)
+print(results2)
+"Optional((indices: [2, 0, 1], distances: [0.0, 3.605551275463989, 3.605551275463989]))"
+</code></pre>
+<h2 id='contributing' class='heading'>Contributing</h2>
+
+<p>Improvements and suggestions are welcome.  Have a look at the TODO list below or open up an issue for other areas of improvement.</p>
+<h2 id='todo' class='heading'>TODO</h2>
+<h3 id='features' class='heading'>Features</h3>
+
+<ul>
+<li>[ ] hamming distance</li>
+<li>[ ] bounds checking for getItem, getNNsForItem, and getNNsForVector</li>
+<li>[ ]</li>
+</ul>
+<h3 id='unit-testing' class='heading'>Unit testing</h3>
+
+<ul>
+<li>[ ] build</li>
+<li>[ ] unbuild</li>
+<li>[ ] unload</li>
+<li>[ ] setVerbose</li>
+<li>[ ] getItem</li>
+<li>[ ] setSeed</li>
+<li>[ ] onDiskBuild</li>
+</ul>
+<h3 id='memory-management' class='heading'>Memory management</h3>
+
+<ul>
+<li>[ ] test for memory leaks</li>
+<li>[ ] verify mmap and prefault function properly</li>
+</ul>
+<h3 id='os-device-testing' class='heading'>OS/device testing</h3>
+
+<ul>
+<li>[ ] macOS</li>
+<li>[ ] iOS</li>
+<li>[ ] Linux</li>
+</ul>
+<h2 id='license' class='heading'>License</h2>
+
+<p>SwiftAnnoy is released with an MIT <a href="https://github.com/jbadger3/SwiftAnnoy/blob/master/LICENSE">license</a>.  If you use SwiftAnnoy in another project, please add a link to this repository in your acknowledgements.</p>
+
+          </section>
+        </section>
+        <section id="footer">
+          <p>&copy; 2020 <a class="link" href="" target="_blank" rel="external"></a>. All rights reserved. (Last updated: 2020-06-01)</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.13.3</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+        </section>
+      </article>
+    </div>
+  </body>
+</div>
+</html>
