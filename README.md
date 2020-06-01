@@ -29,7 +29,7 @@ If you are using Xcode you can do the following:
 5. Click Finish.
 
 ## Usage
-Using SwiftAnnoy is fairly straitforward.  You can follow the code snippets below to get started or have a look at the Jazzy generated [docs](https://jbadger3.github.io/SwiftAnnoy/)
+Using SwiftAnnoy is fairly straitforward.  Follow the code snippets below to get started or have a look at the Jazzy generated [docs](https://jbadger3.github.io/SwiftAnnoy/).
 
 ### Create an index
   First, create an `AnnoyIndex<T>`  as in:
