@@ -1,4 +1,8 @@
 # SwiftAnnoy
+![GitHub tag (latest SemVer pre-release)](https://img.shields.io/github/v/tag/jbadger3/SwiftAnnoy?include_prereleases)
+![GitHub All Releases](https://img.shields.io/github/downloads/jbadger3/SwiftAnnoy/total)
+[![GitHub stars](https://img.shields.io/github/stars/jbadger3/SwiftAnnoy)](https://github.com/jbadger3/SwiftAnnoy/stargazers)
+[![GitHub license](https://img.shields.io/github/license/jbadger3/SwiftAnnoy)](https://github.com/jbadger3/SwiftAnnoy/blob/master/LICENSE)
 
 SwiftAnnoy provides an interface (bindings) to the [Annoy](https://github.com/spotify/annoy) (Approximate Nearest Neighbors Oh Yeah) C++ library.
 
