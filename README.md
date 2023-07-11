@@ -48,7 +48,7 @@ Next, add some data to your index.  There are two functions that can be used to 
 var item0 = [1.0, 1.0]
 var item1 = [3.0, 4.0]
 var item2 = [6.0, 8.0]
-var items = [[item0, item1, item2]]
+var items = [item0, item1, item2]
 
 // add one item
 try? index.addItem(index: 0, vector: &item0)
@@ -63,7 +63,9 @@ In order to run queries on an `AnnoyIndex` the index must first be built.
 ```swift
 try? index.build(numTrees: 1)
 ```
-The argument `numTrees` specifies the number of trees you want Annoy to use to construct the index.  The more trees you include in the index the more accurate the search results will be, but it will take longer to build, take up more space, and require more time to search.  Experiment with this parameter to optimize the tradeoffs.
+This is a one-time operation.  You can't call `index.build` a second time.
+
+The parameter `numTrees` specifies the number of trees you want Annoy to use to construct the index.  The more trees you include in the index the more accurate the search results will be, but it will take longer to build, take up more space, and require more time to search.  Experiment with this parameter to optimize the tradeoffs.
 
 ### Running queries
 An `AnnoyIndex`  can be queried using either an item index or a vector.
@@ -80,6 +82,18 @@ print(results2)
 "Optional((indices: [2, 0, 1], distances: [0.0, 3.605551275463989, 3.605551275463989]))"
 ```
 
+### Saving an index
+```swift
+let fileURL = FileManager.default.temporaryDirectory.appending(path: "index.annoy")
+try? index.save(fileURL)
+```
+
+### Loading a saved index
+```swift
+let fileURL = FileManager.default.temporaryDirectory.appending(path: "index.annoy")
+try? index.load(fileURL)
+
+```
 ## Contributing
 Improvements and suggestions are welcome.  Have a look at the TODO list below or open up an issue for other areas of improvement.
 
