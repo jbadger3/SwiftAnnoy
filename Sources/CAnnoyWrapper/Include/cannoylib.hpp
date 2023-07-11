@@ -23,7 +23,7 @@ bool C_build(int num_trees, char* dist_metric, char* dtype, const void* indexPoi
 bool C_unbuild(const void* indexPointer);
 bool C_save(const char* filename, bool prefault, const void* indexPointer);
 void C_unload(const void* indexPointer);
-bool C_load(const char* filename, char* dist_metric, char* dtype, const void* indexPointer);
+bool C_load(const char* filename, char* dist_metric, char* dtype, bool prefault, const void* indexPointer);
 void C_get_distance(int i, int j, void* result, char* dist_metric, char* dtype, const void* indexPointer);
 void C_get_nns_by_item(int item, int n, int search_k, int* results, void* distances,char* dist_metric, char* dtype, const void* indexPointer);
 void C_get_nns_by_vector(void* vector, int n, int search_k, int* results, void* distances, char* dist_metric, char* dtype, const void* indexPointer);

@@ -116,6 +116,16 @@ final class AnnoyIndexDoubleTests: XCTestCase {
         assertVecsEqual(vec1: indexItem, vec2: expecteditem)
     }
     
+    func test_addItems_givenItemsInIndex_whenNewDataInvalid_throwsError() {
+        //Given
+        givenIndex()
+        
+        // When
+        var newData = [[3.5, 4.4, 2.5], [2.3, 4.6, 2.0]]
+        
+        XCTAssertThrowsError(try sut.addItems(items: &newData))
+    }
+    
     func test_getDistance_euclidean_whenSameItem_returnsDistanceZero() {
         // Given
         givenIndex(metric: .euclidean)

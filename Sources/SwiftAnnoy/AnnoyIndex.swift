@@ -101,7 +101,7 @@ public class AnnoyIndex<T: AnnoyOperable> {
     public func addItems(items: inout [[T]]) throws {
         let beginningNumItems = self.numberOfItems
         for (index, _) in items.enumerated() {
-            try? self.addItem(index: index + beginningNumItems, vector: &items[index])
+            try self.addItem(index: index + beginningNumItems, vector: &items[index])
         }
     }
     
@@ -159,13 +159,16 @@ public class AnnoyIndex<T: AnnoyOperable> {
     
     /**
      Loads a previously saved index.
+     - Parameters:
+        - url: The file URL to load
+        - prefault: If set to true the entire file will be preread into memory.  Default is false which uses memory mapping.
      - Throws: AnnoyIndexError.loadFailed
      */
-    public func load(url: URL) throws {
+    public func load(url: URL, prefault: Bool = false) throws {
         guard let filenameCString = url.path.cString(using: .utf8) else {
             return
         }
-        let success = C_load(filenameCString, &distanceMetric, &dataType, indexPointer)
+        let success = C_load(filenameCString, &distanceMetric, &dataType, prefault, indexPointer)
         if !success {
             throw AnnoyIndexError.loadFailed
         }

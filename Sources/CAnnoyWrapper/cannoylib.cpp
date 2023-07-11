@@ -113,7 +113,7 @@ bool C_unbuild(const void* indexPointer) {
 
 bool C_save(const char* filename, bool prefault, const void* indexPointer) {
     AnnoyIndex<int, float, Euclidean, Kiss32Random> *index = (AnnoyIndex<int, float, Euclidean, Kiss32Random> *)indexPointer;
-    return index->save(filename);
+    return index->save(filename, prefault);
 }
 
 void C_unload(const void* indexPointer) {
@@ -121,40 +121,40 @@ void C_unload(const void* indexPointer) {
     index->unload();
 }
 
-bool C_load(const char* filename, char* dist_metric, char* dtype, const void* indexPointer) {
+bool C_load(const char* filename, char* dist_metric, char* dtype, bool prefault, const void* indexPointer) {
     if (strcmp(dtype, "Float") == 0) {
         if (strcmp(dist_metric, "euclidean") == 0) {
             AnnoyIndex<int, float, Euclidean, Kiss32Random> *index = (AnnoyIndex<int, float, Euclidean, Kiss32Random> *)indexPointer;
-            return index->load(filename);
+            return index->load(filename, prefault);
         }
         else if (strcmp(dist_metric, "manhattan") == 0) {
             AnnoyIndex<int, float, Manhattan, Kiss32Random> *index = (AnnoyIndex<int, float, Manhattan, Kiss32Random> *)indexPointer;
-            return index->load(filename);
+            return index->load(filename, prefault);
         }
         else if (strcmp(dist_metric, "dotProduct") == 0) {
             AnnoyIndex<int, float, DotProduct, Kiss32Random> *index = (AnnoyIndex<int, float, DotProduct, Kiss32Random> *)indexPointer;
-            return index->load(filename);
+            return index->load(filename, prefault);
         }
         else if (strcmp(dist_metric, "angular") == 0) {
             AnnoyIndex<int, float, Angular, Kiss32Random> *index = (AnnoyIndex<int, float, Angular, Kiss32Random> *)indexPointer;
-            return index->load(filename);
+            return index->load(filename, prefault);
         }
     } else if (strcmp(dtype, "Double") == 0) {
         if (strcmp(dist_metric, "euclidean") == 0) {
             AnnoyIndex<int, double, Euclidean, Kiss32Random> *index = (AnnoyIndex<int, double, Euclidean, Kiss32Random> *)indexPointer;
-            return index->load(filename);
+            return index->load(filename, prefault);
         }
         else if (strcmp(dist_metric, "manhattan") == 0) {
             AnnoyIndex<int, double, Manhattan, Kiss32Random> *index = (AnnoyIndex<int, double, Manhattan, Kiss32Random> *)indexPointer;
-            return index->load(filename);
+            return index->load(filename, prefault);
         }
         else if (strcmp(dist_metric, "dotProduct") == 0) {
             AnnoyIndex<int, double, DotProduct, Kiss32Random> *index = (AnnoyIndex<int, double, DotProduct, Kiss32Random> *)indexPointer;
-            return index->load(filename);
+            return index->load(filename, prefault);
         }
         else if (strcmp(dist_metric, "angular") == 0) {
             AnnoyIndex<int, double, Angular, Kiss32Random> *index = (AnnoyIndex<int, double, Angular, Kiss32Random> *)indexPointer;
-            return index->load(filename);
+            return index->load(filename, prefault);
         }
     }
     return false;
